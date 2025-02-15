@@ -315,6 +315,7 @@
     <form action="name.php" method="POST" enctype="multipart/form-data">
         <label for="user_photo">Picture</label>
         <input type="file" name="user_photo" accept="image/*" required></input>
+        <span class="error"> <?php echo $profilePictureErr;?></span>
         <br>
         <br>
         <label for="name">Name</label>
@@ -330,27 +331,33 @@
             <option value="36-50">36-50</option>
             <option value="51+">51+</option>
         </select>
+        <span class="error"> <?php echo $ageErr;?></span>
         <br>
         <br>
         <label for="phone_number">Phone Number:</label>
         <input type="tel" name="phone_number" placeholder="Your phone number"></input>
+        <span class="error"> <?php echo $phone_numberErr;?></span>
         <br>
         <br>
         <label for="email">Email:</label>
         <input type="email" name="email" placeholder="Your email"></input>
+        <span class="error"> <?php echo $emailErr;?></span>
         <br>
         <br>
         <label for="profile_link1">Social Media Link 1:</label>
         <input type="url" name="profile_link1" placeholder="Your social media link"></input>
+        <span class="error"> <?php echo $profile_link1Err;?></span>
         <br>
         <label for="profile_link2">Social Media Link 2:</label>
         <input type="url" name="profile_link2" placeholder="Your social media link"></input>
+        <span class="error"> <?php echo $profile_link2Err;?></span>
         <br>
         <br>
         <label for="country">Country of Residence:</label>
         <select name="country" required>
             <option value="Singapore">Singapore</option>
         </select>
+        <span class="error"> <?php echo $countryErr;?></span>
         <br>
         <label for="location">City/Town of Residence:</label>
         <select name="location" required>
@@ -381,6 +388,7 @@
             <option value="Woodlands">Woodlands</option>
             <option value="Yishun">Yishun</option>
         </select>
+        <span class="error"> <?php echo $locationErr;?></span>
         <br>
         <br>
         <label for="specialization">Choose your specialization:</label>
@@ -393,6 +401,7 @@
             <option value="Automations Engineer">Automations Engineer</option>
             <option value="Game developer">Game developer</option>
         </select>
+        <span class="error"> <?php echo $specializationErr;?></span>
         <br>
         <br>
         <label for="years_of_exp">Years of experience:</label>
@@ -403,54 +412,69 @@
             <option value="8-10">8-10</option>
             <option value="10+">10+</option>
         </select>
+        <span class="error"> <?php echo $years_of_expErr;?></span>
         <br>
         <br>
         Rate your expertise from 1 to 10:
         <br>
         <label for="sql_rank">SQL</label>
         <input type="number" name="sql_rank" min="0" max="10" required></input>
+        <span class="error"> <?php echo $sql_rankErr;?></span>
         <br>
         <label for="javascript_rank">Java Script</label>
         <input type="number" name="javascript_rank" min="0" max="10" required></input>
+        <span class="error"> <?php echo $javascript_rankErr;?></span>
         <br>
         <label for="csharp_rank">C#</label>
         <input type="number" name="csharp_rank" min="0" max="10" required></input>
+        <span class="error"> <?php echo $csharp_rankErr;?></span>
         <br>
         <label for="java_rank">Java</label>
         <input type="number" name="java_rank" min="0" max="10" required></input>
+        <span class="error"> <?php echo $java_rankErr;?></span>
         <br>
         <label for="python_rank">Python</label>
         <input type="number" name="python_rank" min="0" max="10" required></input>
+        <span class="error"> <?php echo $python_rankErr;?></span>
         <br>
         <label for="vb_rank">Visual Basic</label>
         <input type="number" name="vb_rank" min="0" max="10" required></input>
+        <span class="error"> <?php echo $vb_rankErr;?></span>
         <br>
         <label for="cplus_rank">C++</label>
         <input type="number" name="cplus_rank" min="0" max="10" required></input>
+        <span class="error"> <?php echo $cplus_rankErr;?></span>
         <br>
         <label for="c_rank">C</label>
         <input type="number" name="c_rank" min="0" max="10" required></input>
+        <span class="error"> <?php echo $c_rankErr;?></span>
         <br>
         <label for="ruby_rank">Ruby</label>
         <input type="number" name="ruby_rank" min="0" max="10" required></input>
+        <span class="error"> <?php echo $ruby_rankErr;?></span>
         <br>
         <label for="golang_rank">golang</label>
         <input type="number" name="golang_rank" min="0" max="10" required></input>
+        <span class="error"> <?php echo $golang_rankErr;?></span>
         <br>
         <label for="r_rank">R</label>
         <input type="number" name="r_rank" min="0" max="10" required></input>
+        <span class="error"> <?php echo $r_rankErr;?></span>
         <br>
         <label for="rust_rank">Rust</label>
         <input type="number" name="rust_rank" min="0" max="10" required></input>
+        <span class="error"> <?php echo $rust_rankErr;?></span>
         <br>
         <br>
         Tell us about your hobbies:
         <br>
         <label for="gen_hobbies1">First Hobby</label>
-        <input type="text" name="gen_hobbies1" placeholder="Your First Hobby" <?php echo $hobbiesErr[0];?>></input>
+        <input type="text" name="gen_hobbies1" placeholder="Your First Hobby" <?php echo $gen_hobbies1Err;?>></input>
+        <span class="error"> <?php echo $gen_hobbies1Err;?></span>
         <br>
         <label for="gen_hobbies2">Second Hobby</label>
-        <input type="text" name="gen_hobbies2" placeholder="Your Second Hobby" <?php echo $hobbiesErr[1];?>></input>
+        <input type="text" name="gen_hobbies2" placeholder="Your Second Hobby" <?php echo $gen_hobbies2Err;?>></input>
+        <span class="error"> <?php echo $gen_hobbies2Err;?></span>
         <br>
         <br>
         <label for="funny-question">Do you shower? (just kidding, its not required)</label>
