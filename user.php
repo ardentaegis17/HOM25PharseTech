@@ -284,6 +284,17 @@
                 $gen_hobbies2Err = "";
             }
         }
+
+        $sql = "INSERT INTO user (name, age, phone_number, email, profile_link1, profile_link2, country, location, specialization, years_of_exp, sql_rank, javascript_rank, csharp_rank, java_rank, python_rank, vb_rank, cplus_rank, c_rank, ruby_rank, golang_rank, r_rank, rust_rank, gen_hobbies1, gen_hobbies2, shower)
+                VALUES ('$name', '$age', '$phone_number', '$email', '$profile_link1', '$profile_link2', '$country', '$location', '$specialization', '$years_of_exp', '$sql_rank', '$javascript_rank', '$csharp_rank', '$java_rank', '$python_rank', '$vb_rank', '$cplus_rank', '$c_rank', '$ruby_rank', '$golang_rank', '$r_rank', '$rust_rank', '$gen_hobbies1', '$gen_hobbies2', '$shower')";
+        
+        try {
+            $conn->query($sql);
+        } catch (mysqli_sql_exception $e) {
+            echo "Error: " . $sql . "<br>" . $conn->error;
+        }
+        
+        mysqli_close($conn);
     }
 
     function test_input($data) {
