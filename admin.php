@@ -40,7 +40,7 @@
         } else if ($_POST["max_group_size"] < $minGroupSize) {
             $maxGroupSizeErr = "Maximum group size must be greater than or equal to minimum group size";
         } else {
-            $py = shell_exec("python3 groups.py $memberData $minGroupSize $maxGroupSize");
+            $py = shell_exec("python3 Data_algorithm_creation.py $memberData $minGroupSize $maxGroupSize");
             echo "<h2>$py</h2>";
 
             if (strpos ($py, "Error") !== false) {

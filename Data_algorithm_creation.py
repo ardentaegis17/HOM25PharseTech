@@ -1,3 +1,4 @@
+import sys
 import pandas as pd
 from kmodes.kmodes import KModes
 import numpy as np
@@ -5,13 +6,20 @@ from kneed import KneeLocator
 import os
 from sklearn.cluster import KMeans
 
+if len(sys.argv) != 4:
+    print("Please enter the correct number of arguments")
+    sys.exit(1)
 
+# Get the arguments
+file_path = sys.argv[1]
+min_group_size = int(sys.argv[2])
+max_group_size = int(sys.argv[3])
 class Data_algorithm_creation():
 
     # function purpose : Set dataframe. However do configure it when possible.
     @staticmethod
     def File_insert():
-        file_dataframe = pd.read_excel(r"C:\Users\User\Downloads\Updated_Project_Dataset_Coords.xlsx")
+        file_dataframe = pd.read_excel(r"$file_path")
         return file_dataframe
 
     # Function : performing elbow method
@@ -146,8 +154,9 @@ class Data_algorithm_creation():
     #learning -> method , forced K means
     @staticmethod
     def learning_interest(clustered_LOC_file_pref):
-        # Step 1: Define Number of Clusters Based on 6-11 Grouping Rule
-        num_clusters = len(clustered_LOC_file_pref) // 9  # Aiming for ~9 per group
+        # Step 1: Define Number of Clusters Based on min_group_size and max_group_size
+        avg_group_size = (min_group_size + max_group_size) // 2
+        num_clusters = len(clustered_LOC_file_pref) // avg_group_size
 
         # Step 2: Apply K-Means (Fixed Number of Clusters)
         kmeans = KMeans(n_clusters=num_clusters, random_state=42, n_init=10)
