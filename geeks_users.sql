@@ -23,19 +23,16 @@ DROP TABLE IF EXISTS `users`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `users` (
-  `user_id` int NOT NULL,
   `user_photo` blob,
   `name` varchar(255) NOT NULL,
-  `age` varchar(50) NOT NULL,
-  `email` varchar(255) DEFAULT NULL,
+  `email` varchar(255) NOT NULL,
   `phone_number` varchar(100) DEFAULT NULL,
   `location` varchar(255) DEFAULT NULL,
   `profile_link1` varchar(255) DEFAULT NULL,
   `profile_link2` varchar(255) DEFAULT NULL,
   `specialization` varchar(255) NOT NULL,
-  `years_of_exp` varchar(50) NOT NULL,
   `sql_rank` int NOT NULL,
-  `javasript_rank` int NOT NULL,
+  `javascript_rank` int NOT NULL,
   `python_rank` int NOT NULL,
   `java_rank` int NOT NULL,
   `vb_rank` int NOT NULL,
@@ -51,8 +48,7 @@ CREATE TABLE `users` (
   `preference` varchar(255) DEFAULT NULL,
   `latitude` decimal(9,6) DEFAULT NULL,
   `longitude` decimal(10,6) DEFAULT NULL,
-  PRIMARY KEY (`user_id`),
-  UNIQUE KEY `email` (`email`)
+  PRIMARY KEY (`email`),
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

@@ -8,13 +8,13 @@
         if (empty($_POST["username"])) {
             $usernameErr = "Username is required";
         } else {
-            $username = test_input($_POST["username"]);
+            $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_SPECIAL_CHARS);
         }
 
         if (empty($_POST["password"])) {
             $passwordErr = "Password is required";
         } else {
-            $password = test_input($_POST["password"]);
+            $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_SPECIAL_CHARS);
         }
 
         if ($username == "admin") {
@@ -27,6 +27,8 @@
             }
         } else {
             $_SESSION['admin'] = false;
+            header('Location: user.php');
+            exit();
         }
     }
 ?>
@@ -39,13 +41,15 @@
 <body>
     <h1>Welcome to the Small Group Creator!</h1>
     <h2>Log In</h2>
-    <form action="login.php" method="post">
+    <form action="index.php" method="post">
         <label for="username">Username</label>
         <input type="text" name="username" id="username"></input>
+        <span class="error"><?php echo $usernameErr; ?></span>
         <br>
         <br>
         <label for="password">Password</label>
         <input type="password" name="password" id="password"></input>
+        <span class="error"><?php echo $passwordErr; ?></span>
         <br>
         <br>
         <input type="submit" value="Log In">
