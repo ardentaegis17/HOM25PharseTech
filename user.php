@@ -3,354 +3,165 @@
 
     include "database.php";
 
-    $profilePictureErr = $nameErr = $ageErr = $phone_numberErr = $emailErr = $profile_link1Err = $profile_link2Err = $countryErr = $locationErr = $specializationErr = $years_of_expErr = $sql_rankErr = $javascript_rankErr = $csharp_rankErr = $java_rankErr = $python_rankErr = $vb_rankErr = $cplus_rankErr = $c_rankErr = $ruby_rankErr = $golang_rankErr = $r_rankErr = $rust_rankErr = $gen_hobbies1Err = $gen_hobbies2Err = $showerErr = "";
-    $name = $age = $phone_number = $email = $profile_link1 = $profile_link2 = $country = $location = $specialization = $years_of_exp = $sql_rank = $javascript_rank = $csharp_rank = $java_rank = $python_rank = $vb_rank = $cplus_rank = $c_rank = $ruby_rank = $golang_rank = $r_rank = $rust_rank = $gen_hobbies1 = $gen_hobbies2 = $shower = "";
+    $userPhotoErr = $nameErr = $phone_numberErr = $emailErr = $profile_link1Err = $profile_link2Err = $countryErr = $locationErr = $specializationErr = $sql_rankErr = $javascript_rankErr = $csharp_rankErr = $java_rankErr = $python_rankErr = $vb_rankErr = $cplus_rankErr = $c_rankErr = $ruby_rankErr = $golang_rankErr = $r_rankErr = $rust_rankErr = $gen_hobbies1Err = $gen_hobbies2Err = $showerErr = "";
+    $name = $phone_number = $email = $profile_link1 = $profile_link2 = $country = $location = $specialization = $sql_rank = $javascript_rank = $csharp_rank = $java_rank = $python_rank = $vb_rank = $cplus_rank = $c_rank = $ruby_rank = $golang_rank = $r_rank = $rust_rank = $gen_hobbies1 = $gen_hobbies2 = $shower = "";
+    
+    $sql = "SELECT * FROM users";
+    try {
+        $users = $conn->query($sql);
+    } catch (mysqli_sql_exception $e) {
+        echo "Error: " . $sql . "<br>" . $conn->error;
+    }
+
     $target_dir = "uploads/";
     $uploadOk = 1;
 
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        $target_file = $target_dir . basename($_FILES["user_photo"]["name"]);
-        $imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
-
+        $user_photo = $_FILES["user_photo"]["name"];
+        $userPhotoFileType = strtolower(pathinfo($user_photo, PATHINFO_EXTENSION));
+        $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_SPECIAL_CHARS);
+        $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
+        $phone_number = filter_input(INPUT_POST, 'phone_number', FILTER_SANITIZE_NUMBER_INT);
+        $profile_link1 = filter_input(INPUT_POST, 'profile_link1', FILTER_SANITIZE_URL);
+        $profile_link2 = filter_input(INPUT_POST, 'profile_link2', FILTER_SANITIZE_URL);
+        $country = filter_input(INPUT_POST, 'country', FILTER_SANITIZE_SPECIAL_CHARS);
+        $location = filter_input(INPUT_POST, 'location', FILTER_SANITIZE_SPECIAL_CHARS);
+        $specialization = filter_input(INPUT_POST, 'specialization', FILTER_SANITIZE_SPECIAL_CHARS);
+        $sql_rank = filter_input(INPUT_POST, 'sql_rank', FILTER_SANITIZE_NUMBER_INT);
+        $javascript_rank = filter_input(INPUT_POST, 'javascript_rank', FILTER_SANITIZE_NUMBER_INT);
+        $csharp_rank = filter_input(INPUT_POST, 'csharp_rank', FILTER_SANITIZE_NUMBER_INT);
+        $java_rank = filter_input(INPUT_POST, 'java_rank', FILTER_SANITIZE_NUMBER_INT);
+        $python_rank = filter_input(INPUT_POST, 'python_rank', FILTER_SANITIZE_NUMBER_INT);
+        $vb_rank = filter_input(INPUT_POST, 'vb_rank', FILTER_SANITIZE_NUMBER_INT);
+        $cplus_rank = filter_input(INPUT_POST, 'cplus_rank', FILTER_SANITIZE_NUMBER_INT);
+        $c_rank = filter_input(INPUT_POST, 'c_rank', FILTER_SANITIZE_NUMBER_INT);
+        $ruby_rank = filter_input(INPUT_POST, 'ruby_rank', FILTER_SANITIZE_NUMBER_INT);
+        $golang_rank = filter_input(INPUT_POST, 'golang_rank', FILTER_SANITIZE_NUMBER_INT);
+        $r_rank = filter_input(INPUT_POST, 'r_rank', FILTER_SANITIZE_NUMBER_INT);
+        $rust_rank = filter_input(INPUT_POST, 'rust_rank', FILTER_SANITIZE_NUMBER_INT);
+        $gen_hobbies1 = filter_input(INPUT_POST, 'gen_hobbies1', FILTER_SANITIZE_SPECIAL_CHARS);
+        $gen_hobbies2 = filter_input(INPUT_POST, 'gen_hobbies2', FILTER_SANITIZE_SPECIAL_CHARS);
+        $shower = filter_input(INPUT_POST, 'shower', FILTER_SANITIZE_SPECIAL_CHARS);
         $check = getimagesize($_FILES["user_photo"]["tmp_name"]);
-        if (empty($check)) {
-            $profilePictureErr = "Profile.";
-            $uploadOk = 0;
-        } else if (file_exists($target_file)) {
-            $profilePictureErr = "Sorry, file already exists.";
-            $uploadOk = 0;
+        
+        if(empty($name)) {
+            $nameErr = "Name is required";
+        } else if(empty($email)) {
+            $emailErr = "Email is required";
+        } else if ($conn->query("SELECT * FROM users WHERE email = '$email'")->num_rows > 0) {
+            $emailErr = "Email already exists";
+        } else if(empty($country)) {
+            $countryErr = "Country is required";
+        } else if(empty($location)) {
+            $locationErr = "Location is required";
+        } else if(empty($specialization)) {
+            $specializationErr = "Specialization is required";
+        } else if(empty($sql_rank) && $sql_rank != 0) {
+            $sql_rankErr = "SQL rank is required";
+        } else if(empty($javascript_rank) && $javascript_rank != 0) {
+            $javascript_rankErr = "Javascript rank is required";
+        } else if(empty($csharp_rank) && $csharp_rank != 0) {
+            $csharp_rankErr = "C# rank is required";
+        } else if(empty($java_rank) && $java_rank != 0) {
+            $java_rankErr = "Java rank is required";
+        } else if(empty($python_rank) && $python_rank != 0) {
+            $python_rankErr = "Python rank is required";
+        } else if(empty($vb_rank) && $vb_rank != 0) {
+            $vb_rankErr = "Visual Basic rank is required";
+        } else if(empty($cplus_rank) && $cplus_rank != 0) {
+            $cplus_rankErr = "C++ rank is required";
+        } else if(empty($c_rank) && $c_rank != 0) {
+            $c_rankErr = "C rank is required";
+        } else if(empty($ruby_rank) && $ruby_rank != 0) {
+            $ruby_rankErr = "Ruby rank is required";
+        } else if(empty($golang_rank) && $golang_rank != 0) {
+            $golang_rankErr = "Golang rank is required";
+        } else if(empty($r_rank) && $r_rank != 0) {
+            $r_rankErr = "R rank is required";
+        } else if(empty($rust_rank) && $rust_rank != 0) {
+            $rust_rankErr = "Rust rank is required";
+        } else if(empty($gen_hobbies1) && $gen_hobbies1 != 0) {
+            $gen_hobbies1Err = "General hobby 1 is required";
+        } else if(empty($gen_hobbies2) && $gen_hobbies2 != 0) {
+            $gen_hobbies2Err = "General hobby 2 is required";
+        } else if (empty($check)) {
+            $userPhotoErr = "Profile picture is required";
         } else if ($_FILES["user_photo"]["size"] > 500000) {
-            $profilePictureErr = "Sorry, your file is too large.";
-            $uploadOk = 0;
-        } else if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
-            && $imageFileType != "gif") {
-            $profilePictureErr = "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
-            $uploadOk = 0;
-        } else if ($uploadOk == 0) {
-            $profilePictureErr = "Sorry, your file was not uploaded.";
+            $userPhotoErr = "Sorry, your file is too large.";
+        } else if (
+            $userPhotoFileType != "jpg" && 
+            $userPhotoFileType != "png" && 
+            $userPhotoFileType != "jpeg" && 
+            $userPhotoFileType != "gif"
+            ) {
+            $userPhotoErr = "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
         } else {
+            $target_file = $target_dir . basename($_FILES["user_photo"]["name"]);
             if (move_uploaded_file($_FILES["user_photo"]["tmp_name"], $target_file)) {
-                $profilePictureErr = "The file ". htmlspecialchars( basename( $_FILES["user_photo"]["name"])). " has been uploaded.";
                 $uploadOk = 1;
-            } else {
-                $profilePictureErr = "Sorry, there was an error uploading your file.";
-                $uploadOk = 0;
+                echo "The file ". htmlspecialchars( basename( $_FILES["user_photo"]["name"])) . " has been uploaded.";
+            } else if ($uploadOk == 0) {
+                echo "Sorry, there was an error uploading your file.";
             }
-        }
 
-        if (empty($_POST["name"])) {
-            $nameErr = "name is required";
-        } else {
-            $name = test_input($_POST["name"]);
-            // check if name only contains letters and whitespace
-            if (!preg_match("/^[a-zA-Z-' ]*$/",$name)) {
-                $nameErr = "Only letters and white space allowed";
-            } else {
-                $_SESSION["name"] = $name;
-                $nameErr = "";
+            $sql = "INSERT INTO users (user_photo, name, phone_number, email, profile_link1, profile_link2, location, specialization, sql_rank, javascript_rank, csharp_rank, java_rank, python_rank, vb_rank, cplus_rank, c_rank, ruby_rank, golang_rank, r_rank, rust_rank, gen_hobbies1, gen_hobbies2)
+                    VALUES ('$target_file', '$name', '$phone_number', '$email', '$profile_link1', '$profile_link2', '$location', '$specialization', '$sql_rank', '$javascript_rank', '$csharp_rank', '$java_rank', '$python_rank', '$vb_rank', '$cplus_rank', '$c_rank', '$ruby_rank', '$golang_rank', '$r_rank', '$rust_rank', '$gen_hobbies1', '$gen_hobbies2')";
+            try {
+                $conn->query($sql);
+            } catch (mysqli_sql_exception $e) {
+                echo "Error: " . $sql . "<br>" . $conn->error;
             }
-        }
-        
-        if (!empty($_POST["age"])) {
-            $age = test_input($_POST["age"]);
-        }
 
-        if (!empty($_POST["phone_number"])) {
-            $phone_number = test_input($_POST["phone_number"]);
-            if (!preg_match("/^[0-9]*$/",$phone_number)) {
-                $phone_numberErr = "Only numbers allowed";
-            } else {
-                $phone_numberErr = "";
-            }
-        }
+            $_SESSION['user'] = $email;
 
-        if (!empty($_POST["email"])) {
-            $email = test_input($_POST["email"]);
-            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                $emailErr = "Invalid email format";
-            } else {
-                $emailErr = "";
-            }
+            header('Location: index.php');
+            exit();
         }
-
-        if (!empty($_POST["profile_link1"])) {
-            $profile_link1 = test_input($_POST["profile_link1"]);
-            if (!filter_var($profile_link1, FILTER_VALIDATE_URL)) {
-                $profile_link1Err = "Invalid URL";
-            } else {
-                $profile_link1Err = "";
-            }
-        }
-
-        if (!empty($_POST["profile_link2"])) {
-            $profile_link2 = test_input($_POST["profile_link2"]);
-            if (!filter_var($profile_link2, FILTER_VALIDATE_URL)) {
-                $profile_link2Err = "Invalid URL";
-            } else {
-                $profile_link2Err = "";
-            }
-        }
-        
-        if (empty($_POST["country"])) {
-            $countryErr = "country is required";
-        } else {
-            $country = test_input($_POST["country"]);
-            if (!preg_match("/^[a-zA-Z-' ]*$/",$country)) {
-                $countryErr = "Only letters and white space allowed";
-            } else {
-                $countryErr = "";
-            }
-        }
-
-        if (empty($_POST["location"])) {
-            $locationErr = "location is required";
-        } else {
-            $location = test_input($_POST["location"]);
-            if (!preg_match("/^[a-zA-Z-' ]*$/",$location)) {
-                $locationErr = "Only letters and white space allowed";
-            } else {
-                $locationErr = "";
-            }
-        }
-
-        if (empty($_POST["specialization"])) {
-            $specializationErr = "specialization is required";
-        } else {
-            $specialization = test_input($_POST["specialization"]);
-            if (!preg_match("/^[a-zA-Z-' ]*$/",$specialization)) {
-                $specializationErr = "Only letters and white space allowed";
-            } else {
-                $specializationErr = "";
-            }
-        }
-
-        if (empty($_POST["years_of_exp"])) {
-            $years_of_expErr = "years_of_exp is required";
-        } else {
-            $years_of_exp = test_input($_POST["years_of_exp"]);
-            if (!preg_match("/^[0-9-]*$/",$years_of_exp)) {
-                $years_of_expErr = "Only letters and hyphens allowed";
-            } else {
-                $years_of_expErr = "";
-            }
-        }
-
-        if (empty($_POST["sql_rank"])) {
-            $sql_rankErr = "sql_rank is required";
-        } else {
-            $sql_rank = test_input($_POST["sql_rank"]);
-            if (!preg_match("/^[0-9]*$/",$sql_rank)) {
-                $sql_rankErr = "Only numbers allowed";
-            } else {
-                $sql_rankErr = "";
-            }
-        }
-
-        if (empty($_POST["javascript_rank"])) {
-            $javascript_rankErr = "javascript_rank is required";
-        } else {
-            $javascript_rank = test_input($_POST["javascript_rank"]);
-            if (!preg_match("/^[0-9]*$/",$javascript_rank)) {
-                $javascript_rankErr = "Only numbers allowed";
-            } else {
-                $javascript_rankErr = "";
-            }
-        }
-
-        if (empty($_POST["csharp_rank"])) {
-            $csharp_rankErr = "csharp_rank is required";
-        } else {
-            $csharp_rank = test_input($_POST["csharp_rank"]);
-            if (!preg_match("/^[0-9]*$/",$csharp_rank)) {
-                $csharp_rankErr = "Only numbers allowed";
-            } else {
-                $csharp_rankErr = "";
-            }
-        }
-
-        if (empty($_POST["java_rank"])) {
-            $java_rankErr = "java_rank is required";
-        } else {
-            $java_rank = test_input($_POST["java_rank"]);
-            if (!preg_match("/^[0-9]*$/",$java_rank)) {
-                $java_rankErr = "Only numbers allowed";
-            } else {
-                $java_rankErr = "";
-            }
-        }
-
-        if (empty($_POST["python_rank"])) {
-            $python_rankErr = "python_rank is required";
-        } else {
-            $python_rank = test_input($_POST["python_rank"]);
-            if (!preg_match("/^[0-9]*$/",$python_rank)) {
-                $python_rankErr = "Only numbers allowed";
-            } else {
-                $python_rankErr = "";
-            }
-        }
-
-        if (empty($_POST["vb_rank"])) {
-            $vb_rankErr = "vb_rank is required";
-        } else {
-            $vb_rank = test_input($_POST["vb_rank"]);
-            if (!preg_match("/^[0-9]*$/",$vb_rank)) {
-                $vb_rankErr = "Only numbers allowed";
-            } else {
-                $vb_rankErr = "";
-            }
-        }
-
-        if (empty($_POST["cplus_rank"])) {
-            $cplus_rankErr = "cplus_rank is required";
-        } else {
-            $cplus_rank = test_input($_POST["cplus_rank"]);
-            if (!preg_match("/^[0-9]*$/",$cplus_rank)) {
-                $cplus_rankErr = "Only numbers allowed";
-            } else {
-                $cplus_rankErr = "";
-            }
-        }
-
-        if (empty($_POST["c_rank"])) {
-            $c_rankErr = "c_rank is required";
-        } else {
-            $c_rank = test_input($_POST["c_rank"]);
-            if (!preg_match("/^[0-9]*$/",$c_rank)) {
-                $c_rankErr = "Only numbers allowed";
-            } else {
-                $c_rankErr = "";
-            }
-        }
-
-        if (empty($_POST["ruby_rank"])) {
-            $ruby_rankErr = "ruby_rank is required";
-        } else {
-            $ruby_rank = test_input($_POST["ruby_rank"]);
-            if (!preg_match("/^[0-9]*$/",$ruby_rank)) {
-                $ruby_rankErr = "Only numbers allowed";
-            } else {
-                $ruby_rankErr = "";
-            }
-        }
-
-        if (empty($_POST["golang_rank"])) {
-            $golang_rankErr = "golang_rank is required";
-        } else {
-            $golang_rank = test_input($_POST["golang_rank"]);
-            if (!preg_match("/^[0-9]*$/",$golang_rank)) {
-                $golang_rankErr = "Only numbers allowed";
-            } else {
-                $golang_rankErr = "";
-            }
-        }
-
-        if (empty($_POST["r_rank"])) {
-            $r_rankErr = "r_rank is required";
-        } else {
-            $r_rank = test_input($_POST["r_rank"]);
-            if (!preg_match("/^[0-9]*$/",$r_rank)) {
-                $r_rankErr = "Only numbers allowed";
-            } else {
-                $r_rankErr = "";
-            }
-        }
-
-        if (empty($_POST["rust_rank"])) {
-            $rust_rankErr = "rust_rank is required";
-        } else {
-            $rust_rank = test_input($_POST["rust_rank"]);
-            if (!preg_match("/^[0-9]*$/",$rust_rank)) {
-                $rust_rankErr = "Only numbers allowed";
-            } else {
-                $rust_rankErr = "";
-            }
-        }
-
-        if (!empty($_POST["gen_hobbies1"])) {
-            $gen_hobbies1 = test_input($_POST["gen_hobbies1"]);
-            if (!preg_match("/^[a-zA-Z-' ]*$/",$gen_hobbies1)) {
-                $gen_hobbies1Err = "Only letters and white space allowed";
-            } else {
-                $gen_hobbies1Err = "";
-            }
-        }
-
-        if (!empty($_POST["gen_hobbies2"])) {
-            $gen_hobbies2 = test_input($_POST["gen_hobbies2"]);
-            if (!preg_match("/^[a-zA-Z-' ]*$/",$gen_hobbies2)) {
-                $gen_hobbies2Err = "Only letters and white space allowed";
-            } else {
-                $gen_hobbies2Err = "";
-            }
-        }
-
-        $sql = "INSERT INTO user (name, age, phone_number, email, profile_link1, profile_link2, country, location, specialization, years_of_exp, sql_rank, javascript_rank, csharp_rank, java_rank, python_rank, vb_rank, cplus_rank, c_rank, ruby_rank, golang_rank, r_rank, rust_rank, gen_hobbies1, gen_hobbies2, shower)
-                VALUES ('$name', '$age', '$phone_number', '$email', '$profile_link1', '$profile_link2', '$country', '$location', '$specialization', '$years_of_exp', '$sql_rank', '$javascript_rank', '$csharp_rank', '$java_rank', '$python_rank', '$vb_rank', '$cplus_rank', '$c_rank', '$ruby_rank', '$golang_rank', '$r_rank', '$rust_rank', '$gen_hobbies1', '$gen_hobbies2', '$shower')";
-        
-        try {
-            $conn->query($sql);
-        } catch (mysqli_sql_exception $e) {
-            echo "Error: " . $sql . "<br>" . $conn->error;
-        }
-        
         mysqli_close($conn);
-    }
-
-    function test_input($data) {
-        $data = trim($data);
-        $data = stripslashes($data);
-        $data = htmlspecialchars($data);
-        return $data;
+        session_destroy();
     }
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
-    <title>name</title>
+    <title>User</title>
 </head>
 <body>
-    <h1>Welcome, name!</h1>
-    <form action="name.php" method="POST" enctype="multipart/form-data">
-        <label for="user_photo">Picture</label>
+    <h1>Edit Profile</h1>
+    <form action="<?php htmlspecialchars($_SERVER["PHP_SELF"])?>" method="POST" enctype="multipart/form-data">
+        <label for="user_photo">Profile Picture</label>
+        <br>
         <input type="file" name="user_photo" accept="image/*" required></input>
+        <span class="error"> <?php echo $userPhotoErr;?></span>
         <br>
         <br>
-        <label for="name">Name</label>
+        <label for="name">Name: </label>
         <input type="text" name="name" placeholder="Your name" required></input>
         <span class="error"> <?php echo $nameErr;?></span>
         <br>
-        <br>
-        <label for="age">Age:</label>
-        <select name="age" id="age" required>
-            <option value="0-17">0-17</option>
-            <option value="18-25">18-25</option>
-            <option value="26-35">26-35</option>
-            <option value="36-50">36-50</option>
-            <option value="51+">51+</option>
-        </select>
-        <br>
+        <label for="email">Email:</label>
+        <input type="email" name="email" placeholder="Your email" required></input>
+        <span class="error"> <?php echo $emailErr;?></span>
         <br>
         <label for="phone_number">Phone Number:</label>
         <input type="tel" name="phone_number" placeholder="Your phone number"></input>
-        <br>
-        <br>
-        <label for="email">Email:</label>
-        <input type="email" name="email" placeholder="Your email"></input>
-        <br>
+        <span class="error"> <?php echo $phone_numberErr;?></span>
         <br>
         <label for="profile_link1">Social Media Link 1:</label>
         <input type="url" name="profile_link1" placeholder="Your social media link"></input>
+        <span class="error"> <?php echo $profile_link1Err;?></span>
         <br>
         <label for="profile_link2">Social Media Link 2:</label>
         <input type="url" name="profile_link2" placeholder="Your social media link"></input>
+        <span class="error"> <?php echo $profile_link2Err;?></span>
         <br>
         <br>
         <label for="country">Country of Residence:</label>
         <select name="country" required>
             <option value="Singapore">Singapore</option>
         </select>
+        <span class="error"> <?php echo $countryErr;?></span>
         <br>
         <label for="location">City/Town of Residence:</label>
         <select name="location" required>
@@ -381,76 +192,81 @@
             <option value="Woodlands">Woodlands</option>
             <option value="Yishun">Yishun</option>
         </select>
+        <span class="error"> <?php echo $locationErr;?></span>
         <br>
         <br>
         <label for="specialization">Choose your specialization:</label>
         <select name="specialization" id="specialization" required>
-            <option value="Data Specialist">Data Specialist</option>
-            <option value="Backend Engineer">Backend Engineer</option>
-            <option value="UX UI Designer">UX UI Designer</option>
-            <option value="Fullstack programmer">Fullstack programmer</option>
             <option value="Applications developer">Applications developer</option>
             <option value="Automations Engineer">Automations Engineer</option>
+            <option value="Backend Engineer">Backend Engineer</option>
+            <option value="Data Specialist">Data Specialist</option>
+            <option value="Fullstack programmer">Fullstack programmer</option>
             <option value="Game developer">Game developer</option>
+            <option value="UX UI Designer">UX UI Designer</option>
         </select>
+        <span class="error"> <?php echo $specializationErr;?></span>
         <br>
-        <br>
-        <label for="years_of_exp">Years of experience:</label>
-        <select name="years_of_exp" id="years_of_exp" required>
-            <option value="0-1">0-1</option>
-            <option value="2-4">2-4</option>
-            <option value="5-7">5-7</option>
-            <option value="8-10">8-10</option>
-            <option value="10+">10+</option>
-        </select>
-        <br>
-        <br>
-        Rate your expertise from 1 to 10:
+        Rate your expertise from 0 to 10:
         <br>
         <label for="sql_rank">SQL</label>
         <input type="number" name="sql_rank" min="0" max="10" required></input>
+        <span class="error"> <?php echo $sql_rankErr;?></span>
         <br>
         <label for="javascript_rank">Java Script</label>
         <input type="number" name="javascript_rank" min="0" max="10" required></input>
+        <span class="error"> <?php echo $javascript_rankErr;?></span>
         <br>
         <label for="csharp_rank">C#</label>
         <input type="number" name="csharp_rank" min="0" max="10" required></input>
+        <span class="error"> <?php echo $csharp_rankErr;?></span>
         <br>
         <label for="java_rank">Java</label>
         <input type="number" name="java_rank" min="0" max="10" required></input>
+        <span class="error"> <?php echo $java_rankErr;?></span>
         <br>
         <label for="python_rank">Python</label>
         <input type="number" name="python_rank" min="0" max="10" required></input>
+        <span class="error"> <?php echo $python_rankErr;?></span>
         <br>
         <label for="vb_rank">Visual Basic</label>
         <input type="number" name="vb_rank" min="0" max="10" required></input>
+        <span class="error"> <?php echo $vb_rankErr;?></span>
         <br>
         <label for="cplus_rank">C++</label>
         <input type="number" name="cplus_rank" min="0" max="10" required></input>
+        <span class="error"> <?php echo $cplus_rankErr;?></span>
         <br>
         <label for="c_rank">C</label>
         <input type="number" name="c_rank" min="0" max="10" required></input>
+        <span class="error"> <?php echo $c_rankErr;?></span>
         <br>
         <label for="ruby_rank">Ruby</label>
         <input type="number" name="ruby_rank" min="0" max="10" required></input>
+        <span class="error"> <?php echo $ruby_rankErr;?></span>
         <br>
         <label for="golang_rank">golang</label>
         <input type="number" name="golang_rank" min="0" max="10" required></input>
+        <span class="error"> <?php echo $golang_rankErr;?></span>
         <br>
         <label for="r_rank">R</label>
         <input type="number" name="r_rank" min="0" max="10" required></input>
+        <span class="error"> <?php echo $r_rankErr;?></span>
         <br>
         <label for="rust_rank">Rust</label>
         <input type="number" name="rust_rank" min="0" max="10" required></input>
+        <span class="error"> <?php echo $rust_rankErr;?></span>
         <br>
         <br>
         Tell us about your hobbies:
         <br>
-        <label for="gen_hobbies1">First Hobby</label>
-        <input type="text" name="gen_hobbies1" placeholder="Your First Hobby" <?php echo $hobbiesErr[0];?>></input>
+        <label for="gen_hobbies1">First Hobby: </label>
+        <input type="text" name="gen_hobbies1" placeholder="Your First Hobby" <?php echo $gen_hobbies1Err;?>></input>
+        <span class="error"> <?php echo $gen_hobbies1Err;?></span>
         <br>
-        <label for="gen_hobbies2">Second Hobby</label>
-        <input type="text" name="gen_hobbies2" placeholder="Your Second Hobby" <?php echo $hobbiesErr[1];?>></input>
+        <label for="gen_hobbies2">Second Hobby: </label>
+        <input type="text" name="gen_hobbies2" placeholder="Your Second Hobby" <?php echo $gen_hobbies2Err;?>></input>
+        <span class="error"> <?php echo $gen_hobbies2Err;?></span>
         <br>
         <br>
         <label for="funny-question">Do you shower? (just kidding, its not required)</label>
@@ -464,9 +280,15 @@
         <br>
         <button type="submit">Submit</button>
         <br>
-        <br>
         <input type="reset"></input>
     </form>
+    <br>
     <a href="index.php">Back to home</a>
+    <br>
+    <br>
 </body>
 </html>
+
+<?php
+    
+?>
