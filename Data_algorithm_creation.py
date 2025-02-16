@@ -11,9 +11,10 @@ if len(sys.argv) != 4:
     sys.exit(1)
 
 # Get the arguments
-file_path = sys.argv[1]
-min_group_size = int(sys.argv[2])
-max_group_size = int(sys.argv[3])
+FILE_PATH = sys.argv[1]
+MIN_GROUP_SIZE = int(sys.argv[2])
+MAX_GROUP_SIZE = int(sys.argv[3])
+AVG_GROUP_SIZE = (MIN_GROUP_SIZE + MAX_GROUP_SIZE) // 2
 class Data_algorithm_creation():
 
     # function purpose : Set dataframe. However do configure it when possible.
@@ -116,14 +117,14 @@ class Data_algorithm_creation():
             df_specialization = clustered_LOC_file_pref[
                 clustered_LOC_file_pref["Specialization"] == specialization].copy()
 
-            # Assign cluster IDs in groups of 6
+            # Assign cluster IDs in groups of MIN_GROUP_SIZE
             count = 0  # Counter for number of people in the current cluster
             for index in df_specialization.index:
                 df_specialization.at[index, "groupings_cluster"] = cluster_id
                 count += 1
 
-                # Once 6 people are assigned, increment the cluster ID
-                if count == 6:
+                # Once MIN_GROUP_SIZE people are assigned, increment the cluster ID
+                if count == MIN_GROUP_SIZE:
                     cluster_id += 1
                     count = 0
 
@@ -154,9 +155,8 @@ class Data_algorithm_creation():
     #learning -> method , forced K means
     @staticmethod
     def learning_interest(clustered_LOC_file_pref):
-        # Step 1: Define Number of Clusters Based on min_group_size and max_group_size
-        avg_group_size = (min_group_size + max_group_size) // 2
-        num_clusters = len(clustered_LOC_file_pref) // avg_group_size
+        # Step 1: Define Number of Clusters Based on MIN_GROUP_SIZE and MAX_GROUP_SIZE
+        num_clusters = len(clustered_LOC_file_pref) // AVG_GROUP_SIZE
 
         # Step 2: Apply K-Means (Fixed Number of Clusters)
         kmeans = KMeans(n_clusters=num_clusters, random_state=42, n_init=10)
@@ -165,9 +165,9 @@ class Data_algorithm_creation():
         # Step 3: Check Cluster Sizes
         cluster_sizes = clustered_LOC_file_pref["groupings_cluster"].value_counts()
 
-        # Step 4: If Any Cluster < 6, Merge to Closest Cluster
+        # Step 4: If Any Cluster < MIN_GROUP_SIZE, Merge to Closest Cluster
         for cluster_id, size in cluster_sizes.items():
-            if size < 6:
+            if size < MIN_GROUP_SIZE:
                 # Find data points in this cluster
                 cluster_points = clustered_LOC_file_pref[clustered_LOC_file_pref["groupings_cluster"] == cluster_id]
 
@@ -179,16 +179,16 @@ class Data_algorithm_creation():
                 clustered_LOC_file_pref.loc[clustered_LOC_file_pref[
                                                 "groupings_cluster"] == cluster_id, "groupings_cluster"] = closest_cluster_id
 
-        # Step 5: If Any Cluster > 11, Split It
+        # Step 5: If Any Cluster > MAX_GROUP_SIZE, Split It
         cluster_sizes = clustered_LOC_file_pref["groupings_cluster"].value_counts()
         for cluster_id, size in cluster_sizes.items():
-            if size > 11:
+            if size > MAX_GROUP_SIZE:
                 # Find data points in this large cluster
                 large_cluster_points = clustered_LOC_file_pref[
                     clustered_LOC_file_pref["groupings_cluster"] == cluster_id]
 
                 # Split it into smaller sub-groups
-                num_new_clusters = size // 9  # Keep ~9 per group
+                num_new_clusters = size // AVG_GROUP_SIZE  # Keep ~AVG_GROUP_SIZE per group
                 sub_kmeans = KMeans(n_clusters=num_new_clusters, random_state=42, n_init=10)
                 sub_labels = sub_kmeans.fit_predict(large_cluster_points.loc[:, "SQL":"Rust"])
 
@@ -217,7 +217,7 @@ class Data_algorithm_creation():
 
         Data_categorize = clustered_LOC_file_pref.loc[:, ["General Hobbies 1", "General Hobbies 2"]]
 
-        kmode = KModes(n_clusters=len(clustered_LOC_file_pref) / 9, init="huang", n_init=6, verbose=0)
+        kmode = KModes(n_clusters=len(clustered_LOC_file_pref) / AVG_GROUP_SIZE, init="huang", n_init=MIN_GROUP_SIZE, verbose=0)
         clustered_LOC_file_pref["groupings_cluster"] = kmode.fit_predict(Data_categorize)
 
         clustered_LOC_file_pref["groupings_cluster"] = (
@@ -288,7 +288,7 @@ class Data_algorithm_creation():
 def main():
     curr_DF = Data_algorithm_creation.Entire_DB_Merger()
     curr_DF.to_excel("clustering_results_High_defined_clustered.xlsx", index=False)
-    os.startfile("clustering_results_High_defined_clustered.xlsx")
+    print(curr_DF)
 
 
 # Ensure this runs only when executed directly

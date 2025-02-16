@@ -1,6 +1,5 @@
 <?php
     include 'database.php';
-
     class Event {
         private $cover;
         private $id;
@@ -78,6 +77,8 @@
     }
 
     $events_array = array();
+    $target_dir = "uploads/";
+    $uploadOk = 1;
     
     $sql = "SELECT * FROM events";
     try {
@@ -93,35 +94,24 @@
                 array_push($events_array, $event);
             }
         }
-        echo json_encode($events_array);
     } else {
         echo "0 results";
-    }
-
-    foreach ($events_array as $event) {
-        echo '<img src="data:image/jpeg;base64,'.base64_encode($event->get_cover()).'"/>';
-        echo "ID: " . $event->get_id() . "\n";
-        echo "Name: " . $event->get_name() . "\n";
-        echo "Address: " . $event->get_address() . "\n";
-        echo "Location: " . $event->get_location() . "\n";
-        echo "Timing: " . $event->get_timing() . "\n";
-        echo "Description: " . $event->get_description() . "\n";
     }
 
     $coverError = $nameError = $addressError = $locationError = $timingError = $descriptionError = "";
     $cover = $name = $address = $location = $timing = $description = "";
 
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        $cover = $_FILES['cover']['tmp_name'];
+        $target_file = $target_dir . basename($_FILES["cover"]["name"]);
+        move_uploaded_file($_FILES["cover"]["tmp_name"], $target_file);
+        $cover = file_get_contents($target_file);
         $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_SPECIAL_CHARS);
         $address = filter_input(INPUT_POST, 'address', FILTER_SANITIZE_SPECIAL_CHARS);
         $location = filter_input(INPUT_POST, 'location', FILTER_SANITIZE_SPECIAL_CHARS);
         $timing = filter_input(INPUT_POST, 'timing', FILTER_SANITIZE_SPECIAL_CHARS);
         $description = filter_input(INPUT_POST, 'description', FILTER_SANITIZE_SPECIAL_CHARS);
 
-        if (empty($cover)) {
-            $coverError = "Cover is required";
-        } else if (empty($name)) {
+        if (empty($name)) {
             $nameError = "Name is required";
         } else if (empty($address)) {
             $addressError = "Address is required";
@@ -129,10 +119,9 @@
             $locationError = "Location is required";
         } else if (empty($timing)) {
             $timingError = "Timing is required";
-        } else if (empty($description)) {
-            $descriptionError = "Description is required";
         } else {
-            $sql = "INSERT INTO events (cover, name, address, location, timing, description) VALUES ('$cover', '$name', '$address', '$location', '$timing', '$description')";
+            $sql = "INSERT INTO events (cover, name, address, location, timing, description)
+                    VALUES ('$target_file', '$name', '$address', '$location', '$timing', '$description')";
             try {
                 $conn->query($sql);
             } catch (mysqli_sql_exception $e) {
@@ -209,12 +198,12 @@
         <div id="events">
             <?php
                 foreach ($events_array as $event) {
-                    echo '<img src="data:image/jpeg;base64,'.base64_encode($event->get_cover()).'"/>';
-                    echo "Name: " . $event->get_name() . "\n";
-                    echo "Address: " . $event->get_address() . "\n";
-                    echo "Location: " . $event->get_location() . "\n";
-                    echo "Timing: " . $event->get_timing() . "\n";
-                    echo "Description: " . $event->get_description() . "\n";
+                    echo "<img src='" . $target_file . "'?>/> <br>";
+                    echo "Name: " . $event->get_name() . "<br>";
+                    echo "Address: " . $event->get_address() . "<br>";
+                    echo "Location: " . $event->get_location() . "<br>";
+                    echo "Timing: " . $event->get_timing() . "<br>";
+                    echo "Description: " . $event->get_description() . "<br><br><br>";
                 }
             ?>
         </div>

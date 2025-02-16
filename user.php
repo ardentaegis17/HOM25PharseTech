@@ -13,6 +13,9 @@
         echo "Error: " . $sql . "<br>" . $conn->error;
     }
 
+    $target_dir = "uploads/";
+    $uploadOk = 1;
+
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $user_photo = $_FILES["user_photo"]["name"];
         $userPhotoFileType = strtolower(pathinfo($user_photo, PATHINFO_EXTENSION));
@@ -93,8 +96,16 @@
             ) {
             $userPhotoErr = "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
         } else {
+            $target_file = $target_dir . basename($_FILES["user_photo"]["name"]);
+            if (move_uploaded_file($_FILES["user_photo"]["tmp_name"], $target_file)) {
+                $uploadOk = 1;
+                echo "The file ". htmlspecialchars( basename( $_FILES["user_photo"]["name"])) . " has been uploaded.";
+            } else if ($uploadOk == 0) {
+                echo "Sorry, there was an error uploading your file.";
+            }
+
             $sql = "INSERT INTO users (user_photo, name, phone_number, email, profile_link1, profile_link2, location, specialization, sql_rank, javascript_rank, csharp_rank, java_rank, python_rank, vb_rank, cplus_rank, c_rank, ruby_rank, golang_rank, r_rank, rust_rank, gen_hobbies1, gen_hobbies2)
-                    VALUES ('$user_photo', '$name', '$phone_number', '$email', '$profile_link1', '$profile_link2', '$location', '$specialization', '$sql_rank', '$javascript_rank', '$csharp_rank', '$java_rank', '$python_rank', '$vb_rank', '$cplus_rank', '$c_rank', '$ruby_rank', '$golang_rank', '$r_rank', '$rust_rank', '$gen_hobbies1', '$gen_hobbies2')";
+                    VALUES ('$target_file', '$name', '$phone_number', '$email', '$profile_link1', '$profile_link2', '$location', '$specialization', '$sql_rank', '$javascript_rank', '$csharp_rank', '$java_rank', '$python_rank', '$vb_rank', '$cplus_rank', '$c_rank', '$ruby_rank', '$golang_rank', '$r_rank', '$rust_rank', '$gen_hobbies1', '$gen_hobbies2')";
             try {
                 $conn->query($sql);
             } catch (mysqli_sql_exception $e) {

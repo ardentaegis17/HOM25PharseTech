@@ -1,54 +1,69 @@
 <?php
-    session_start();
-    if (!isset($_SESSION['admin'])) {
-        header('Location: login.php');
-        exit();
+session_start();
+if (!isset($_SESSION['admin'])) {
+    header('Location: login.php');
+    exit();
+}
+
+include 'database.php';
+require 'vendor/autoload.php';
+require 'excelReader/excel_reader2.php';
+require 'excelReader/SpreadsheetReader.php';
+
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+
+$memberDataErr = $minGroupSizeErr = $maxGroupSizeErr = "";
+$memberData = $minGroupSize = $maxGroupSize = "";
+$target_dir = "uploads/";
+$MEMBER_DATA_FILENAME = "member_data.xlsx";
+$uploadOk = 1;
+
+// Check if the uploads directory exists, if not create it
+if (!is_dir($target_dir)) {
+    mkdir($target_dir, 0777, true);
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $target_file = $target_dir . basename($_FILES["member_data"]["name"]);
+
+    try {
+        $spreadsheet = IOFactory::load($_FILES["member_data"]["tmp_name"]);
+        $memberData = $target_dir . $MEMBER_DATA_FILENAME;
+        $writer = new Xlsx($spreadsheet);
+        $writer->save($memberData);
+    } catch (Exception $e) {
+        $memberDataErr = "Invalid file";
     }
 
-    require 'database.php';
-    require 'vendor/autoload.php';
+    $minGroupSize = filter_input(INPUT_POST, 'min_group_size', FILTER_SANITIZE_NUMBER_INT);
+    $maxGroupSize = filter_input(INPUT_POST, 'max_group_size', FILTER_SANITIZE_NUMBER_INT);
+    
+    if (empty($_FILES["member_data"]["name"])) {
+        $memberDataErr = "Member data is required";
+    } else if (empty($_POST["min_group_size"])) {
+        $minGroupSizeErr = "Minimum group size is required";
+    } else if ($_POST["min_group_size"] < 1) {
+        $minGroupSizeErr = "Minimum group size must be at least 1";
+    } else if (empty($_POST["max_group_size"])) {
+        $maxGroupSizeErr = "Maximum group size is required";
+    } else if ($_POST["max_group_size"] < 1) {
+        $maxGroupSizeErr = "Maximum group size must be at least 1";
+    } else if ($_POST["max_group_size"] < $minGroupSize) {
+        $maxGroupSizeErr = "Maximum group size must be greater than or equal to minimum group size";
+    } else {
+        $py = shell_exec("python Data_algorithm_creation.py $memberData $minGroupSize $maxGroupSize");
 
-    use PhpOffice\PhpSpreadsheet\IOFactory;
-    use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-
-    $memberDataErr = $minGroupSizeErr = $maxGroupSizeErr = "";
-    $memberData = $minGroupSize = $maxGroupSize = "";
-
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        try {
-            $spreadsheet = IOFactory::load($_FILES["member_data"]["tmp_name"]);
-            $memberData = tempnam(sys_get_temp_dir(), 'member_data') . '.xlsx';
-            $writer = new Xlsx($spreadsheet);
-            $writer->save($memberData);
-        } catch (Exception $e) {
+        if (strpos($py, "Error") !== false) {
             $memberDataErr = "Invalid file";
-        }
-
-        $minGroupSize = filter_input(INPUT_POST, 'min_group_size', FILTER_SANITIZE_NUMBER_INT);
-        $maxGroupSize = filter_input(INPUT_POST, 'max_group_size', FILTER_SANITIZE_NUMBER_INT);
-        
-        if (empty($_FILES["member_data"]["name"])) {
-            $memberDataErr = "Member data is required";
-        } else if (empty($_POST["min_group_size"])) {
-            $minGroupSizeErr = "Minimum group size is required";
-        } else if ($_POST["min_group_size"] < 1) {
-            $minGroupSizeErr = "Minimum group size must be at least 1";
-        } else if (empty($_POST["max_group_size"])) {
-            $maxGroupSizeErr = "Maximum group size is required";
-        } else if ($_POST["max_group_size"] < 1) {
-            $maxGroupSizeErr = "Maximum group size must be at least 1";
-        } else if ($_POST["max_group_size"] < $minGroupSize) {
-            $maxGroupSizeErr = "Maximum group size must be greater than or equal to minimum group size";
         } else {
-            $py = shell_exec("python3 Data_algorithm_creation.py $memberData $minGroupSize $maxGroupSize");
+            $py = shell_exec("python xlsx_to_php.py $memberData");
 
-            if (strpos ($py, "Error") !== false) {
-                $memberDataErr = "Invalid file";
-            } else {
-                echo "<a href=\"groups.php\">View Groups</a>";
-            }
+            header('Location: groups.php');
+            exit();
         }
     }
+}
 ?>
 
 <!DOCTYPE html>
@@ -77,4 +92,4 @@
         <input type="submit" value="Create">
     </form>
 </body>
-</html>
+</html> 
