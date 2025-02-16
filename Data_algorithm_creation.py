@@ -217,7 +217,11 @@ class Data_algorithm_creation():
 
         Data_categorize = clustered_LOC_file_pref.loc[:, ["General Hobbies 1", "General Hobbies 2"]]
 
-        kmode = KModes(n_clusters=len(clustered_LOC_file_pref) / 9, init="huang", n_init=6, verbose=0)
+        # Convert n_clusters to an integer
+        num_clusters = int(len(clustered_LOC_file_pref) // 9)  # Floor division to ensure an integer
+
+        kmode = KModes(n_clusters=num_clusters, init="huang", n_init=6, verbose=0)
+
         clustered_LOC_file_pref["groupings_cluster"] = kmode.fit_predict(Data_categorize)
 
         clustered_LOC_file_pref["groupings_cluster"] = (
@@ -257,23 +261,27 @@ class Data_algorithm_creation():
         Output_file = file_var.copy()
         Output_file = pd.DataFrame(columns=Output_file.columns)
 
-        #Step 5 , Loop through each cluster
+        # Step 5 , Loop through each cluster
         for i in range(0, Optimal_cluster_numbers):
             Curr_clustered_LOC_file = file_var[file_var["LOC cluster"] == i]
 
-            #Step 6 , loop through each preference , industry
-            Curr_clustered_LOC_file_pref = file_var[file_var["Preference"] == "Industry interest"]
-            Output_file = pd.concat([Output_file, Data_algorithm_creation.industry_interest(Curr_clustered_LOC_file_pref)])
+            # Step 6 , loop through each preference , industry
+            Curr_clustered_LOC_file_pref = Curr_clustered_LOC_file[
+                Curr_clustered_LOC_file["Preference"] == "Industry interest"]
+            Output_file = pd.concat(
+                [Output_file, Data_algorithm_creation.industry_interest(Curr_clustered_LOC_file_pref)])
 
             # Step 7 , loop through each preference , learning
-            Curr_clustered_LOC_file_pref = file_var[file_var["Preference"] == "Overall learning capability"]
-
-            Output_file = pd.concat([Output_file, Data_algorithm_creation.learning_interest(Curr_clustered_LOC_file_pref)])
+            Curr_clustered_LOC_file_pref = Curr_clustered_LOC_file[
+                Curr_clustered_LOC_file["Preference"] == "Overall learning capability"]
+            Output_file = pd.concat(
+                [Output_file, Data_algorithm_creation.learning_interest(Curr_clustered_LOC_file_pref)])
 
             # Step 8 , loop through each preference , Hobbies
-            Curr_clustered_LOC_file_pref = file_var[file_var["Preference"] == "Hobbies interest"]
-
-            Output_file = pd.concat([Output_file, Data_algorithm_creation.HOBBIES_interest(Curr_clustered_LOC_file_pref)])
+            Curr_clustered_LOC_file_pref = Curr_clustered_LOC_file[
+                Curr_clustered_LOC_file["Preference"] == "Hobbies interest"]
+            Output_file = pd.concat(
+                [Output_file, Data_algorithm_creation.HOBBIES_interest(Curr_clustered_LOC_file_pref)])
 
         print("==========")
         print(Output_file)
