@@ -20,7 +20,7 @@ class Data_algorithm_creation():
     # function purpose : Set dataframe. However do configure it when possible.
     @staticmethod
     def File_insert():
-        file_dataframe = pd.read_excel(r"$file_path")
+        file_dataframe = pd.read_excel(FILE_PATH)
         return file_dataframe
 
     # Function : performing elbow method
@@ -213,11 +213,14 @@ class Data_algorithm_creation():
     def HOBBIES_interest(clustered_LOC_file_pref):
 
         Data_categorize = pd.DataFrame
-        print(clustered_LOC_file_pref.columns)
 
         Data_categorize = clustered_LOC_file_pref.loc[:, ["General Hobbies 1", "General Hobbies 2"]]
 
-        kmode = KModes(n_clusters=len(clustered_LOC_file_pref) / 9, init="huang", n_init=6, verbose=0)
+        # Convert n_clusters to an integer
+        num_clusters = int(len(clustered_LOC_file_pref) // AVG_GROUP_SIZE)  # Floor division to ensure an integer
+
+        kmode = KModes(n_clusters=num_clusters, init="huang", n_init=MIN_GROUP_SIZE, verbose=0)
+
         clustered_LOC_file_pref["groupings_cluster"] = kmode.fit_predict(Data_categorize)
 
         clustered_LOC_file_pref["groupings_cluster"] = (
@@ -261,7 +264,7 @@ class Data_algorithm_creation():
         for i in range(0, Optimal_cluster_numbers):
             Curr_clustered_LOC_file = file_var[file_var["LOC cluster"] == i]
 
-            # Step 6 , loop through each preference , industry
+            #Step 6 , loop through each preference , industry
             Curr_clustered_LOC_file_pref = Curr_clustered_LOC_file[
                 Curr_clustered_LOC_file["Preference"] == "Industry interest"]
             Output_file = pd.concat(
@@ -291,7 +294,8 @@ class Data_algorithm_creation():
 
 def main():
     curr_DF = Data_algorithm_creation.Entire_DB_Merger()
-    curr_DF.to_excel("clustering_results_High_defined_clustered.xlsx", index=False)
+    print(curr_DF)
+    curr_DF.to_excel(FILE_PATH, index=False)
     print(curr_DF)
 
 

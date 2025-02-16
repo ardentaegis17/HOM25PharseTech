@@ -198,7 +198,7 @@
         <div id="events">
             <?php
                 foreach ($events_array as $event) {
-                    echo "<img src='" . $target_file . "'?>/> <br>";
+                    echo "<img width='300' height='200' src='" . $event->get_cover() . "'?> <br>";
                     echo "Name: " . $event->get_name() . "<br>";
                     echo "Address: " . $event->get_address() . "<br>";
                     echo "Location: " . $event->get_location() . "<br>";

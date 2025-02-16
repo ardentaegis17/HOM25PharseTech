@@ -13,7 +13,7 @@
     foreach ($users as $user) {
         $user_group = $user['groupings_cluster'];
         if (empty($groups[$user_group])) {
-            $groups[$user_group] = [];
+            $groups += array($user_group => array());
         }
         array_push($groups[$user_group], $user['email']);
     }
