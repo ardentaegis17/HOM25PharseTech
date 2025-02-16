@@ -57,7 +57,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (strpos($py, "Error") !== false) {
             $memberDataErr = "Invalid file";
         } else {
-            $py = shell_exec("python xlsx_to_php.py $memberData");
+            $py = shell_exec("python xlsx_to_sql.py $memberData");
 
             header('Location: groups.php');
             exit();
